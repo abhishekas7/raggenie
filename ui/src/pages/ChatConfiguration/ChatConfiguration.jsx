@@ -20,6 +20,8 @@ import Modal from 'src/components/Modal/Modal';
 import { deleteBotCapability, saveBotCapability, updateBotCapability } from 'src/services/Capability';
 import { getBotConfiguration, getLLMProviders, saveBotConfiguration, saveBotInferene } from 'src/services/BotConfifuration';
 import { useNavigate } from 'react-router-dom';
+import TitleDescription from 'src/components/TitleDescription/TitleDescription';
+import VectorEmpty from "./assets/vectorEmpty.svg"
 
 
 const BotConfiguration = () => {
@@ -36,9 +38,20 @@ const BotConfiguration = () => {
 
     const [selectedProvider, setSelectedProvider] = useState()
 
+    const [selectedVectordb, setSelectedVectordb] = useState()
+
     const [capabalities, setCapabalities] = useState([])
 
     const [llmModels, setllmModels] = useState([])
+
+    const [showVectorDbForm,setshowVectorDbForm] = useState(false)
+
+    const [vectorDB, setVectorDB] = useState([
+        { label: "SingleStore Database", value: "singlestore"},
+        { label: "MongoDB Atlas", value: "mongodb"},
+        { label: "Pinecone Database", value: "pinecone"}
+      ]);
+      
 
     const [editCapabilityIndexRef, setEditCapabilityIndexRef] = useState("")
     const [editParamsIdRef, setEditParamsIdRef] = useState("")
@@ -144,6 +157,10 @@ const BotConfiguration = () => {
     const { errors: inferenceFormError } = inferenceFormState
 
 
+    const { register: vectorDbRegister, setValue: vectorDbSetValue, handleSubmit : vectorDbHandleSubmit, formState: vectorDbFormState, control: vectorDbController } = useForm({mode : "all"})
+    const { errors: vectorDbFormError } = vectorDbFormState
+
+
     const onBotConfigSave = (data) => {
         saveBotConfiguration(currentConfigID, data ).then(response => {
                 setActiveInferencepiontTab(false)
@@ -242,6 +259,9 @@ const BotConfiguration = () => {
         });
     }
 
+    const vectorDbSave = (data) => {
+
+    }
 
     const addNewCapability = ()=>{
         //console.log({capabalities})
@@ -376,6 +396,50 @@ const BotConfiguration = () => {
         setCapabalities(tempCapabalities)
     }
 
+    const vectordbHandleSubmit=()=>{
+
+    }
+
+
+    const loadDbBasedForm = (dbName) => {
+        switch (dbName) {
+            case 'singlestore':
+                return (
+                    <>
+                        {/* Parameters for SingleStore Database */}
+                        <div>SingleStore Database Parameters</div>
+                    </>
+                );
+            case 'mongodb':
+                return (
+                    <>
+                        <Input label="Connection URI" hasError={vectorDbFormError["url"]?.message ? true : false} errorMessage={vectorDbFormError["url"]?.message}  {...vectorDbRegister("url", { required: "This field is required", maxLength: 50 })} />
+                        <Input label="Your MongoDB Atlas password" type="password" hasError={!!vectorDbFormError["password"]?.message} errorMessage={vectorDbFormError["password"]?.message} {...vectorDbRegister("password", {
+                            required: "This field is required", maxLength: 50
+                        })}
+                        />
+
+
+                    </>
+                );
+            case 'pinecone':
+                return (
+                    <>
+                        <Input label="API Key" hasError={vectorDbFormError["apikey"]?.message ? true : false} errorMessage={vectorDbFormError["url"]?.message}  {...vectorDbRegister("url", { required: "This field is required", maxLength: 50 })} />
+                        <Input label="Your MongoDB Atlas password" type="password" hasError={!!vectorDbFormError["password"]?.message} errorMessage={vectorDbFormError["password"]?.message} {...vectorDbRegister("password", {
+                            required: "This field is required", maxLength: 50
+                        })}
+                        />
+
+
+                    </>
+                );
+            default:
+                return null; // In case no database is selected
+        }
+    };
+    
+
 
 
     useEffect(() => {
@@ -383,6 +447,8 @@ const BotConfiguration = () => {
        
       
     }, [])
+
+
 
 
 
@@ -397,23 +463,23 @@ const BotConfiguration = () => {
                     <form onSubmit={configHandleSubmit(onBotConfigSave)}>
                         <div>
                         <Input 
-  label="Bot Configuration Name" 
-  maxLength={50} 
-  value={configWatch("botName")} 
-  hasError={configFormError["botName"]?.message ? true : false} 
-  errorMessage={configFormError["botName"]?.message}  
-  {...configRegister("botName", { 
-    required: "This field is required", 
-    maxLength: {
-      value: 50,
-      message: "The maximum length is 50 characters"
-    },
-    minLength: {
-      value: 10,
-      message: "The minimum length is 20 characters"
-    }
-  })} 
-/>
+                                label="Bot Configuration Name"
+                                maxLength={50}
+                                value={configWatch("botName")}
+                                hasError={configFormError["botName"]?.message ? true : false}
+                                errorMessage={configFormError["botName"]?.message}
+                                {...configRegister("botName", {
+                                    required: "This field is required",
+                                    maxLength: {
+                                        value: 50,
+                                        message: "The maximum length is 50 characters"
+                                    },
+                                    minLength: {
+                                        value: 10,
+                                        message: "The minimum length is 20 characters"
+                                    }
+                                })}
+                            />
                             <Input label="Bot Short Description" placeholder="brief detail about the use case of the bot" minLength={20} maxLength={200} value={configWatch("botShortDescription")} hasError={configFormError["botShortDescription"]?.message ? true : false} errorMessage={configFormError["botShortDescription"]?.message}  {...configRegister("botShortDescription", { required: "This field is required", minLength: {value: 20, message : "minimun length is 20"}, maxLength: {value: 200, message: "maximum length is 200"}})}  />
                             <Textarea label="Bot Long Description" placeholder="detailed information about the bot, including its full use case and functionalities" rows={10} minLength={50} maxLength={400} value={configWatch("botLongDescription")} hasError={configFormError["botLongDescription"]?.message ? true : false} errorMessage={configFormError["botLongDescription"]?.message}  {...configRegister("botLongDescription", { required: "This field is required", minLength:{value: 50, message: "minimun length is 50"}, maxLength: {value: 400, message: "maximum length is 400"}})} />
                             
@@ -430,25 +496,25 @@ const BotConfiguration = () => {
                 <Tab title="Inference Endpoint" disabled={activeInferencepiontTab} tabKey="inferenceendpoint">
                     <form onSubmit={inferenceHandleSubmit(onInferanceSave)}>
                         <div>
-                            <Input label="Name" hasError={inferenceFormError["inferenceName"]?.message ? true : false} errorMessage={inferenceFormError["inferenceName"]?.message}  {...inferenceRegister("inferenceName", { required: "This field is required", maxLength: 50})} />
-                            <div style={{marginBottom: "30px"}}>
+                            <Input label="Name" hasError={inferenceFormError["inferenceName"]?.message ? true : false} errorMessage={inferenceFormError["inferenceName"]?.message}  {...inferenceRegister("inferenceName", { required: "This field is required", maxLength: 50 })} />
+                            <div style={{ marginBottom: "30px" }}>
                                 <Controller
                                     control={inferenceController}
                                     name='inferenceProvider'
                                     render={() => (
-                                            <Select label={"LLM Provider"} placeholder={llmModels[0]?.label} options={llmModels} value={selectedProvider} onChange={setSelectedProvider} />
-                                        )}
+                                        <Select label={"LLM Provider"} placeholder={llmModels[0]?.label} options={llmModels} value={selectedProvider} onChange={setSelectedProvider} />
+                                    )}
                                 />
-                                
-                                {configFormError["inferenceProvider"]?.message && <span style={{color: "#FF7F6D"}}>{configFormError["inferenceProvider"]?.message}</span> }
-                            </div>   
-                            <Input label="Model Name" hasError={inferenceFormError["inferenceModelName"]?.message ? true : false} errorMessage={inferenceFormError["inferenceModelName"]?.message}  {...inferenceRegister("inferenceModelName", { required: "This field is required"})}  />
-                            <Input label="Endpoint" hasError={inferenceFormError["inferenceEndpoint"]?.message ? true : false} errorMessage={inferenceFormError["inferenceEndpoint"]?.message}  {...inferenceRegister("inferenceEndpoint", { required: "This field is required"})}  />
-                            <Input label="API Key" type="password" hasError={inferenceFormError["inferenceAPIKey"]?.message ? true : false} errorMessage={inferenceFormError["inferenceAPIKey"]?.message}  {...inferenceRegister("inferenceAPIKey", { required: "This field is required"})}  />
+
+                                {configFormError["inferenceProvider"]?.message && <span style={{ color: "#FF7F6D" }}>{configFormError["inferenceProvider"]?.message}</span>}
+                            </div>
+                            <Input label="Model Name" hasError={inferenceFormError["inferenceModelName"]?.message ? true : false} errorMessage={inferenceFormError["inferenceModelName"]?.message}  {...inferenceRegister("inferenceModelName", { required: "This field is required" })} />
+                            <Input label="Endpoint" hasError={inferenceFormError["inferenceEndpoint"]?.message ? true : false} errorMessage={inferenceFormError["inferenceEndpoint"]?.message}  {...inferenceRegister("inferenceEndpoint", { required: "This field is required" })} />
+                            <Input label="API Key" type="password" hasError={inferenceFormError["inferenceAPIKey"]?.message ? true : false} errorMessage={inferenceFormError["inferenceAPIKey"]?.message}  {...inferenceRegister("inferenceAPIKey", { required: "This field is required" })} />
                         </div>
                         <div className={`${style.SaveConfigContainer} ${style.InferenceSaveContainer}`}>
-                            <div style={{flexGrow: 1}}>
-                                <Button type="transparent" className="icon-button" onClick={()=>setActiveTab("configuration")} > <FaArrowLeft/> Back</Button>
+                            <div style={{ flexGrow: 1 }}>
+                                <Button type="transparent" className="icon-button" onClick={() => setActiveTab("configuration")} > <FaArrowLeft /> Back</Button>
                             </div>
                             <div>
                                 <Button buttonType="submit" className="icon-button">  Save <FiCheckCircle /></Button>
@@ -456,6 +522,48 @@ const BotConfiguration = () => {
                         </div>
                     </form>
                 </Tab>
+
+                {/*==============vectorDB tab==================*/}
+                <Tab title="VectorDB" disabled={false} tabKey="vectordb">
+
+                    {showVectorDbForm ? (
+                        <form onSubmit={vectorDbHandleSubmit()}>
+                            <TitleDescription title="Vector Database details" description="Provide your vector database connection details to enable efficient similarity searches and optimize your application's performance." />
+
+                            <Controller
+                                control={inferenceController}
+                                name='vectorDbProvider'
+                                render={() => (
+                                    <Select label={"Select Vector Database"} placeholder={vectorDB[0]?.label} options={vectorDB} value={selectedVectordb} onChange={setSelectedVectordb} />
+                                )}
+                            />
+
+                            {configFormError["vectorDbProvider"]?.message && <span style={{ color: "#FF7F6D" }}>{configFormError["vectorDbProvider"]?.message}</span>}
+                            {selectedVectordb?.value && loadDbBasedForm(selectedVectordb.value)}
+                        </form>
+                    ) : (
+                        <>
+                            <div className={style.VectorContainer}>
+                                <div className={style.VectorContent}>
+                                <img src={VectorEmpty} alt='vectorempty' />
+                                <p>Chroma DB is the currently selected vector database. Do you want to proceed with this choice, or would you like to change the vector database?</p>
+                                <div className={style.VectorControls}>
+                                <Button variant='secondary' className="icon-button" onClick={()=>{setshowVectorDbForm(!showVectorDbForm)}}> <FaArrowLeft /> Back</Button>
+                                <Button buttonType="submit" className="icon-button" onClick={() => setActiveTab("capabalities")} > Continue <FaRegArrowAltCircleRight/></Button>
+
+                                </div>
+                                </div>
+                            </div>
+
+                        </>
+                    )}
+
+
+
+                </Tab>
+
+
+
                 <Tab title="Capabilities" disabled={activeInferencepiontTab} tabKey="capabalities" key={"capabalities"}>
                             <div style={{marginBottom: "30px"}}>
                                 <h4>Capabilities details</h4>
