@@ -22,6 +22,9 @@ import { getBotConfiguration, getLLMProviders, saveBotConfiguration, saveBotInfe
 import { useNavigate } from 'react-router-dom';
 import TitleDescription from 'src/components/TitleDescription/TitleDescription';
 import VectorEmpty from "./assets/vectorEmpty.svg"
+import singlestore from "./assets/SingleStore.svg"
+import mongodbatlas from "./assets/mongodb.svg"
+import pinecore from "./assets/pinecone.svg"
 
 
 const BotConfiguration = () => {
@@ -47,10 +50,36 @@ const BotConfiguration = () => {
     const [showVectorDbForm,setshowVectorDbForm] = useState(false)
 
     const [vectorDB, setVectorDB] = useState([
-        { label: "SingleStore Database", value: "singlestore"},
-        { label: "MongoDB Atlas", value: "mongodb"},
-        { label: "Pinecone Database", value: "pinecone"}
+        { 
+          label: (
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <img src={singlestore} alt="SingleStore" style={{ marginRight: '8px' }} />
+              SingleStore Database
+            </div>
+          ), 
+          value: "singlestore" 
+        },
+        { 
+          label: (
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <img src={mongodbatlas} alt="MongoDB Atlas" style={{ marginRight: '8px' }} />
+              MongoDB Atlas
+            </div>
+          ), 
+          value: "mongodb" 
+        },
+        { 
+          label: (
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <img src={pinecore} alt="Pinecone" style={{ marginRight: '8px' }} />
+              Pinecone Database
+            </div>
+          ), 
+          value: "pinecone" 
+        }
       ]);
+      
+      
       
 
     const [editCapabilityIndexRef, setEditCapabilityIndexRef] = useState("")
@@ -260,7 +289,8 @@ const BotConfiguration = () => {
     }
 
     const vectorDbSave = (data) => {
-
+console.log(data);
+console.log("hi");
     }
 
     const addNewCapability = ()=>{
@@ -340,7 +370,6 @@ const BotConfiguration = () => {
             return 
         }
 
-        console.log({ k: editCapabilityIndexRef})
         capabalities?.map((item, index)=>{
                
                 if(index == editCapabilityIndexRef){
@@ -396,9 +425,7 @@ const BotConfiguration = () => {
         setCapabalities(tempCapabalities)
     }
 
-    const vectordbHandleSubmit=()=>{
 
-    }
 
 
     const loadDbBasedForm = (dbName) => {
@@ -406,47 +433,67 @@ const BotConfiguration = () => {
             case 'singlestore':
                 return (
                     <>
-                        {/* Parameters for SingleStore Database */}
-                        <div>SingleStore Database Parameters</div>
+                        <Input label="Username" hasError={!!vectorDbFormError["user"]?.message} errorMessage={vectorDbFormError["user"]?.message} {...vectorDbRegister("user", {
+                            required: "This field is required", maxLength: 50
+                        })} />
+                        <Input label="Password" type="password" hasError={!!vectorDbFormError["password"]?.message} errorMessage={vectorDbFormError["password"]?.message} {...vectorDbRegister("password", {
+                            required: "This field is required", maxLength: 50
+                        })} />
+                        <Input label="Host" hasError={!!vectorDbFormError["host"]?.message} errorMessage={vectorDbFormError["host"]?.message} {...vectorDbRegister("host", {
+                            required: "This field is required", maxLength: 100
+                        })} />
+                        <Input label="Port" type="number" defaultValue={3306} hasError={!!vectorDbFormError["port"]?.message} errorMessage={vectorDbFormError["port"]?.message} {...vectorDbRegister("port", {
+                            required: "This field is required", maxLength: 5
+                        })} />
+                        <Input label="Database" hasError={!!vectorDbFormError["database"]?.message} errorMessage={vectorDbFormError["database"]?.message} {...vectorDbRegister("database", {
+                            required: false, maxLength: 50
+                        })} />
                     </>
                 );
             case 'mongodb':
                 return (
                     <>
-                        <Input label="Connection URI" hasError={vectorDbFormError["url"]?.message ? true : false} errorMessage={vectorDbFormError["url"]?.message}  {...vectorDbRegister("url", { required: "This field is required", maxLength: 50 })} />
-                        <Input label="Your MongoDB Atlas password" type="password" hasError={!!vectorDbFormError["password"]?.message} errorMessage={vectorDbFormError["password"]?.message} {...vectorDbRegister("password", {
+                        <Input label="URI" hasError={!!vectorDbFormError["uri"]?.message} errorMessage={vectorDbFormError["uri"]?.message} defaultValue="mongodb+srv://Adfolk0poc:<db_password>@adfolk-poc.4g47e.mongodb.net/?retryWrites=true&w=majority&appName=adfolk-poc" {...vectorDbRegister("uri", {
+                            required: "This field is required", maxLength: 200
+                        })} />
+                        <Input label="Password" type="password" hasError={!!vectorDbFormError["password"]?.message} errorMessage={vectorDbFormError["password"]?.message} defaultValue="" {...vectorDbRegister("password", {
                             required: "This field is required", maxLength: 50
-                        })}
-                        />
-
-
+                        })} />
                     </>
                 );
             case 'pinecone':
                 return (
                     <>
-                        <Input label="API Key" hasError={vectorDbFormError["apikey"]?.message ? true : false} errorMessage={vectorDbFormError["url"]?.message}  {...vectorDbRegister("url", { required: "This field is required", maxLength: 50 })} />
-                        <Input label="Your MongoDB Atlas password" type="password" hasError={!!vectorDbFormError["password"]?.message} errorMessage={vectorDbFormError["password"]?.message} {...vectorDbRegister("password", {
+                        <Input label="API Key" hasError={!!vectorDbFormError["api_key"]?.message} errorMessage={vectorDbFormError["api_key"]?.message} {...vectorDbRegister("api_key", {
                             required: "This field is required", maxLength: 50
-                        })}
-                        />
-
-
+                        })} />
+                        <Input label="Environment" hasError={!!vectorDbFormError["environment"]?.message} errorMessage={vectorDbFormError["environment"]?.message} {...vectorDbRegister("environment", {
+                            required: "This field is required", maxLength: 50
+                        })} />
                     </>
                 );
             default:
-                return null; // In case no database is selected
+                return null;
         }
     };
     
+    
+const onClickCancel=()=>{
+    setshowVectorDbForm(!showVectorDbForm)
+    loadDbBasedForm("singlestore")
 
+}
 
+const handleDatabaseChangeAndSubmit = (selectedDb) => {
+    setSelectedVectordb(selectedDb); // Set the selected database
 
-    useEffect(() => {
-        getLLMModels();
-       
-      
-    }, [])
+    // Automatically submit the form with the current form data
+    vectorDbHandleSubmit((data) => {
+        console.log("Form Data Submitted: ", data);
+        // Submission logic
+        vectorDbSave(data); 
+    })();
+};
 
 
 
@@ -527,31 +574,43 @@ const BotConfiguration = () => {
                 <Tab title="VectorDB" disabled={false} tabKey="vectordb">
 
                     {showVectorDbForm ? (
-                        <form onSubmit={vectorDbHandleSubmit()}>
-                            <TitleDescription title="Vector Database details" description="Provide your vector database connection details to enable efficient similarity searches and optimize your application's performance." />
+                        <form onSubmit={vectorDbHandleSubmit(vectorDbSave)}>
+                            <div className={style.VectorFormContainer}>
+                                <div className={style.VectorFields}>
+                                    <TitleDescription title="Vector Database details" description="Provide your vector database connection details to enable efficient similarity searches and optimize your application's performance." />
 
-                            <Controller
-                                control={inferenceController}
-                                name='vectorDbProvider'
-                                render={() => (
-                                    <Select label={"Select Vector Database"} placeholder={vectorDB[0]?.label} options={vectorDB} value={selectedVectordb} onChange={setSelectedVectordb} />
-                                )}
-                            />
+                                    <Controller
+                                        control={inferenceController}
+                                        name='vectorDbProvider'
+                                        render={() => (
+                                            <Select label={"Select Vector Database"} placeholder={vectorDB[0]?.label} options={vectorDB} value={selectedVectordb}  onChange={handleDatabaseChange} />
+                                        )}
+                                    />
 
-                            {configFormError["vectorDbProvider"]?.message && <span style={{ color: "#FF7F6D" }}>{configFormError["vectorDbProvider"]?.message}</span>}
-                            {selectedVectordb?.value && loadDbBasedForm(selectedVectordb.value)}
+                                    {configFormError["vectorDbProvider"]?.message && <span style={{ color: "#FF7F6D" }}>{configFormError["vectorDbProvider"]?.message}</span>}
+                                    {selectedVectordb?.value && loadDbBasedForm(selectedVectordb.value)}
+                                </div>
+                                <div className={`${style.SaveVectorContainer} ${style.VectorSaveContainer}`}>
+                                    <div style={{ flexGrow: 1 }}>
+                                        <Button type="transparent" className="icon-button" onClick={() => setActiveTab("inferenceendpoint")} > <FaArrowLeft /> Back</Button>
+                                    </div>
+                                    <div>
+                                        <Button buttonType="submit" className="icon-button">  Save <FiCheckCircle /></Button>
+                                    </div>
+                                </div>
+                            </div>
                         </form>
                     ) : (
                         <>
                             <div className={style.VectorContainer}>
                                 <div className={style.VectorContent}>
-                                <img src={VectorEmpty} alt='vectorempty' />
-                                <p>Chroma DB is the currently selected vector database. Do you want to proceed with this choice, or would you like to change the vector database?</p>
-                                <div className={style.VectorControls}>
-                                <Button variant='secondary' className="icon-button" onClick={()=>{setshowVectorDbForm(!showVectorDbForm)}}> <FaArrowLeft /> Back</Button>
-                                <Button buttonType="submit" className="icon-button" onClick={() => setActiveTab("capabalities")} > Continue <FaRegArrowAltCircleRight/></Button>
+                                    <img src={VectorEmpty} alt='vectorempty' />
+                                    <p>Chroma DB is the currently selected vector database. Do you want to proceed with this choice, or would you like to change the vector database?</p>
+                                    <div className={style.VectorControls}>
+                                        <Button variant='secondary' className="icon-button" onClick={() => {onClickCancel()}}> <FaArrowLeft /> Back</Button>
+                                        <Button buttonType="submit" className="icon-button" onClick={() => setActiveTab("capabalities")} > Continue <FaRegArrowAltCircleRight /></Button>
 
-                                </div>
+                                    </div>
                                 </div>
                             </div>
 

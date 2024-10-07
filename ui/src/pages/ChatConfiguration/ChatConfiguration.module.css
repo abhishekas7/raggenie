@@ -89,3 +89,27 @@
     align-items: center;
     margin-top: 20px;
 }
+
+.SaveVectorContainer {
+    bottom: 20px;
+    border-radius: var(--8, 8px);
+    background: #F9F9F9;
+    height: auto;
+    bottom: 20px;
+    padding: 17px 19px 18px 16px;
+    align-content: space-around;
+    justify-content: space-between;
+}
+
+.VectorSaveContainer {
+    display: flex;
+}
+.VectorFields{
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+}
+.VectorFormContainer{
+    display: flex;
+    flex-direction: column;
+}

@@ -48,6 +48,10 @@ const Select = ({label, placeholder, options, value, hasError = false, errorMess
             borderRadius: '4px',
             boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)'
         }),
+        input: (provided) => ({
+            ...provided,
+            color: 'transparent'
+            }),
         menuList: (provided) => ({
             ...provided,
             padding: '0'
