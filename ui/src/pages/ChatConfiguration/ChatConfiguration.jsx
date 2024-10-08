@@ -289,9 +289,31 @@ const BotConfiguration = () => {
     }
 
     const vectorDbSave = (data) => {
-console.log(data);
-console.log("hi");
-    }
+        const filteredData = {};
+        switch (selectedVectordb?.value) {
+            case 'singlestore':
+                filteredData.user = data.user;
+                filteredData.password = data.password;
+                filteredData.host = data.host;
+                filteredData.port = data.port;
+                filteredData.database = data.database;
+                break;
+            case 'mongodb':
+                filteredData.uri = data.uri;
+                filteredData.password = data.password;
+                break;
+            case 'pinecone':
+                filteredData.api_key = data.api_key;
+                filteredData.environment = data.environment;
+                break;
+            default:
+                break;
+        }
+    
+        console.log("Filtered Data:", filteredData);
+        // Now you can send filteredData to your API or handle it as needed
+    };
+    
 
     const addNewCapability = ()=>{
         //console.log({capabalities})
@@ -480,19 +502,11 @@ console.log("hi");
     
 const onClickCancel=()=>{
     setshowVectorDbForm(!showVectorDbForm)
-    loadDbBasedForm("singlestore")
 
 }
 
-const handleDatabaseChangeAndSubmit = (selectedDb) => {
+const handleDatabaseChange = (selectedDb) => {
     setSelectedVectordb(selectedDb); // Set the selected database
-
-    // Automatically submit the form with the current form data
-    vectorDbHandleSubmit((data) => {
-        console.log("Form Data Submitted: ", data);
-        // Submission logic
-        vectorDbSave(data); 
-    })();
 };
 
 
