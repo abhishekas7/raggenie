@@ -1,6 +1,6 @@
 // ConfigurationList.jsx
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import SearchInput from "src/components/SearchInput/SearchInput";
 import Table from "src/components/Table/Table";
 import Tag from "src/components/Tag/Tag";
@@ -14,6 +14,9 @@ import { BACKEND_SERVER_URL } from "src/config/const";
 import confirmDialog from "src/utils/ConfirmDialog";
 
 const ConfigurationList = ({ configurations = [], onPluginDelete }) => {
+
+
+  const [config,setConfig]  = useState(configurations)
 
   const handleDelete = (pluginId) => {
     confirmDialog(
@@ -67,12 +70,21 @@ const ConfigurationList = ({ configurations = [], onPluginDelete }) => {
     }
 
 ]
+
+const onSearchPlugins = (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    const filteredPlugins = configurations.filter((config) =>
+        config.connector_name.toLowerCase().includes(searchTerm)
+    );
+
+    setConfig(filteredPlugins);
+};
   return(
     <>
         <div>
             <div className={` ${style.SearchContainer}`}>
                 <div className="flex-grow-1">
-                    <SearchInput style={{width: "349px"}}/>
+                    <SearchInput style={{width: "349px"}} onChange={(e)=>{onSearchPlugins(e)}}/>
                 </div>
                 <div>
                     <Link to={"/plugins/sources"}>
@@ -80,7 +92,7 @@ const ConfigurationList = ({ configurations = [], onPluginDelete }) => {
                     </Link>
                 </div>
             </div>
-            <Table columns={tableColumns} data={configurations} />
+            <Table columns={tableColumns} data={config} />
         </div>
 
     </>
