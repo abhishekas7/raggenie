@@ -563,7 +563,24 @@
     /* 24px */
 }
 
-.ChatNavBar button:last-child:hover {
+.ChatNavBar button:last-child:disabled {
+    cursor:default;
+    border-radius: var(--4, 4px);
+    background: #ECF5FF;
+    padding: 3px 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    outline: none;
+    border: none;
+    border-radius: var(--4, 4px);
+    background: #C1C1C1;
+    color: #888787;
+
+    /* 24px */
+}
+
+.ChatNavBar button:hover {
     background-color: #CDE5FF;
     color: #3893FF;
 }
@@ -585,7 +602,8 @@
 }
 
 
-
+.Disabled {
+    pointer-events: none;}
 
 
 .ChatHistoryHeading {

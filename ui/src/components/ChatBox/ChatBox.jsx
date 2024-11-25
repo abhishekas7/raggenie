@@ -49,7 +49,7 @@ const ChatBox = forwardRef(({messageBoxRef = null, handleNavigateChatContext=()=
                             <div ref={messageBoxRef} className={style.ChatBoxTextBox} contentEditable="plaintext-only" onKeyDown={onKeyDown} onKeyUp={onKeyUp}>
                             </div>
                             <div>
-                                <div className={style.ChatBoxSendIcon} onClick={onSendClick}></div>
+                                <div className={`${style.ChatBoxSendIcon} ${isLoading ? style.Disabled : ''}`} onClick={onSendClick}></div>
                             </div>
                         </div>
                         <div>
@@ -57,7 +57,7 @@ const ChatBox = forwardRef(({messageBoxRef = null, handleNavigateChatContext=()=
                         </div>
                     </div>
                 </div>
-                <ChatHistorySideBar handleNavigateChatContext={handleNavigateChatContext} onCreateNewChat={onCreateNewChat} chatHistory={chatHistory} onClick={(e, setIsHidden) => toggleContainer(e, setIsHidden)}/>     
+                <ChatHistorySideBar isLoading={isLoading} handleNavigateChatContext={handleNavigateChatContext} onCreateNewChat={onCreateNewChat} chatHistory={chatHistory} onClick={(e, setIsHidden) => toggleContainer(e, setIsHidden)}/>     
           </div>
         </>
     )

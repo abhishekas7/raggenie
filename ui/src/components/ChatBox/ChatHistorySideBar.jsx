@@ -1,13 +1,13 @@
 import { useRef, useState } from 'react'
 import style from "./ChatBox.module.css"
-import plusIcon from "./assets/plus-image.svg"
 import arrowRight from "./assets/arrow-right.svg"
 import ChatHistoryButton from "src/components/ChatBox/ChatHistoryButton"
 import Clock from "./assets/time-lap.svg"
 import ChatDropdownMenu from './ChatDropdownMenu/ChatDropdownMenu'
+import { LuPlus } from 'react-icons/lu'
 
 
-function ChatHistorySideBar({handleNavigateChatContext=()=>{}, onCreateNewChat=()=>{}, onClick=()=> {}, chatHistory }) {
+function ChatHistorySideBar({isLoading=false, handleNavigateChatContext=()=>{}, onCreateNewChat=()=>{}, onClick=()=> {}, chatHistory }) {
 
   const toggleHistoryRef = useRef(null)
   const [isHidden, setIsHidden] = useState(false);
@@ -59,7 +59,7 @@ const resultArray = Object.values(formattedData);
           </div>)}
 
           <h3>Chat History</h3>
-          <button onClick={(e)=>{onCreateNewChat(e)}}>NewChat<span><img src={plusIcon} /></span></button>
+          <button onClick={(e)=>{onCreateNewChat(e)}} disabled={isLoading}>NewChat<LuPlus /></button>
         </div>
         <div className={style.ChatHistoryContent}>
           <div className={style.RecentChat}>
